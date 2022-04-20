@@ -1,4 +1,4 @@
-import gym
+# import gym
 from gym.spaces import Discrete, Box, MultiDiscrete, Tuple
 
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
@@ -15,18 +15,20 @@ class CapitalConstPlan(MultiAgentEnv):
     - n_hh households produce using capital and decide how much of their income
      to invest in new capital goods and and how much to consume.
 
-    - Competitive firms produce the capital goods and sells it at marginal cost.
+    - Competitive firms produce the capital goods and sells it at marginal
+    cost.
 
-    -The problem is formulated as a multi-agent problem with centralized learning and decentralized execution.
-     Since the problem of all households is symmetric, one neural net learns from the experuence of all agents,
-     so the policy is shared.
-
+    -The problem is formulated as a multi-agent problem with centralized
+    learning and decentralized execution.
+     Since the problem of all households is symmetric, one neural net learns from the experuence 
+     of all agents,so the policy is shared.
     - Capital goods are durable and have a depreciation rate delta.
 
-    - Each household faces two TFP shocks, an idiosyncratic shock and an aggrgate shock.
+    - Each household faces two TFP shocks, an idiosyncratic shock and an aggr gate shock.
 
-    - The observation space includes the stock of all houeholds on all capital goods (n_hh*n_capital),
-    the idiosyncratic shock of each  household (n_hh shocks), and an aggreagte shock.
+    - The observation space includes the stock of all houeholds on all capital goods 
+    (n_hh*n_capital), the idiosyncratic shock of each  household (n_hh shocks), and an aggreagte
+     shock.
 
     - The action space for each houeholds is the proportion of their income that is to be invested.
 
@@ -84,7 +86,7 @@ class CapitalConstPlan(MultiAgentEnv):
         self.max_s_ij = self.max_savings / self.n_capital * 1.5
 
         # SPECIFIC SHOCK VALUES THAT ARE USEFUL FOR EVALUATION
-        if self.eval_mode == True:
+        if self.eval_mode:
             self.shocks_eval_agg = {0: 0}
             for t in range(1, self.horizon + 1):
                 self.shocks_eval_agg[t] = (
@@ -100,7 +102,7 @@ class CapitalConstPlan(MultiAgentEnv):
                     else [1 - (i % 2) for i in range(self.n_hh)]
                 )
         # SPECIFIC SHOCK VALUES THAT ARE USEFUL FOR EVALUATION
-        if self.analysis_mode == True:
+        if self.analysis_mode:
             self.shocks_analysis_agg = {0: 0}
             for t in range(1, self.horizon + 1):
                 self.shocks_analysis_agg[t] = (
@@ -160,7 +162,7 @@ class CapitalConstPlan(MultiAgentEnv):
         self.timestep = 0
 
         # to evaluate policies, we fix the initial observation
-        if self.eval_mode == True:
+        if self.eval_mode:
             k_init = np.array(
                 [
                     self.k_ss * 0.9 if i % 2 == 0 else self.k_ss * 0.8
@@ -172,7 +174,7 @@ class CapitalConstPlan(MultiAgentEnv):
             shocks_idtc_init = self.shocks_eval_idtc[0]
             shock_agg_init = self.shocks_eval_agg[0]
 
-        elif self.analysis_mode == True:
+        elif self.analysis_mode:
             k_init = np.array(
                 [
                     self.k_ss * 0.9 if i % 2 == 0 else self.k_ss * 0.8
@@ -203,9 +205,10 @@ class CapitalConstPlan(MultiAgentEnv):
             shock_agg_init = random.choices(list(range(len(self.shock_idtc_values))))[0]
 
         # Now we need to reorganize the state so each firm observes his own state first.
-        # First, organize stocks as list of lists, where inner list [i] reflect stocks for  hh with index i.
+        # First, organize stocks as list of lists, where inner list [i] reflect stocks for hh
+        # with index i.
         k_ij_init = [
-            list(k_init[i * self.n_capital : i * self.n_capital + self.n_capital])
+            list(k_init[i * self.n_capital: i * self.n_capital + self.n_capital])
             for i in range(self.n_hh)
         ]
 
@@ -277,7 +280,7 @@ class CapitalConstPlan(MultiAgentEnv):
 
         # organize per houehold per firm and create capital bundle
         k_ij = [
-            list(k[i * self.n_capital : i * self.n_capital + self.n_capital])
+            list(k[i * self.n_capital: i * self.n_capital + self.n_capital])
             for i in range(self.n_hh)
         ]
         k_bundle_i = [1 for i in range(self.n_hh)]
@@ -328,10 +331,10 @@ class CapitalConstPlan(MultiAgentEnv):
         ]
 
         # update shock
-        if self.eval_mode == True:
+        if self.eval_mode:
             shocks_idtc_id_new = np.array(self.shocks_eval_idtc[self.timestep])
             shock_agg_id_new = self.shocks_eval_agg[self.timestep]
-        elif self.analysis_mode == True:
+        elif self.analysis_mode:
             shocks_idtc_id_new = np.array(self.shocks_analysis_idtc[self.timestep])
             shock_agg_id_new = self.shocks_analysis_agg[self.timestep]
         else:
@@ -458,6 +461,7 @@ def main():
         )
 
         print("obs", obs)
+        print(type(obs))
         # print("rew", rew)
         # print("info", info)
 

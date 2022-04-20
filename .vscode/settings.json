@@ -1,0 +1,11 @@
+{
+    "python.linting.flake8Args": [
+        "--max-line-length=100"
+    ],
+    "python.formatting.blackArgs": [
+        "--max-line-length=100"
+    ],
+    "python.formatting.autopep8Args": [
+        "--max-line-length=100"
+    ]
+}
